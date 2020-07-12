@@ -1,0 +1,22 @@
+# Imaging Masks
+wall_hsv_mask :
+  mask:
+    - 119
+    - 73
+    - 192
+fog_hsv_mask : # [101 147 184], [99, 226, 191]
+  mask:
+    - 105
+    - 51
+    - 119
+  offsets:
+    - 0
+    - 0
+    - 0
+waypoint_hsv_mask :
+  mask:
+    - 111
+    - 10
+    - 255
+
+# walls on screen 116 180 41
