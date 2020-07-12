@@ -6,6 +6,7 @@ from poe.screen.images import ImageFactory
 from poe.common import movement as mv
 from utils.math import coordinates as coord
 import time
+import cv2
 
 
 class POEBot:
@@ -13,8 +14,9 @@ class POEBot:
     def __init__(self):
         self.app = POEApp()
         self.images = ImageFactory.get_images()
-        self.movement_distance = 450
+        self.movement_distance = 400
         self.movement_delay = .5
+        self.movement_variance = 100
         self.pickup_delay = 1.5
         self.minimap_center_pt = (self.app.minimap_cropper.mid_x, self.app.minimap_cropper.mid_y)
         self.n_actions = 0
@@ -37,20 +39,20 @@ class POEBot:
                                        mini_radians)
         return coords, mini_distance
 
-    def find_img_in_screen(self, bgr_img, threshold=.6):
+    def find_img_in_screen(self, bgr_img, threshold=.6, debug=False):
         self.app.update_screen()
         box_pts = imgf.get_template_img_location(self.app.bgr_screen, bgr_img, threshold)
         # print(box_pts)
         if box_pts is not None:
             center_img_pt = coord.get_centroid(box_pts)
-            # import cv2
-            # cv2.rectangle(self.app.bgr_screen,
-            #               (box_pts[1][0], box_pts[1][1]),
-            #               (box_pts[0][0], box_pts[0][1]),
-            #               color=(0, 0, 255),
-            #               thickness=2)
-            # cv2.imshow("img", self.app.bgr_screen)
-            # cv2.waitKey(0)
+            if debug:
+                cv2.rectangle(self.app.bgr_screen,
+                              (box_pts[1][0], box_pts[1][1]),
+                              (box_pts[0][0], box_pts[0][1]),
+                              color=(0, 0, 255),
+                              thickness=2)
+                cv2.imshow("img", self.app.bgr_screen)
+                cv2.waitKey(0)
             return (int(center_img_pt[0]), int(center_img_pt[1]))
         return None
 
@@ -109,21 +111,32 @@ class POEBot:
         return imgf.nearest_nonzero_idx(self.app.get_masked_bgr_minimap('fog'),
                                         self.minimap_center_pt)
 
-    def go_to_fog(self):  # [105,43,107]
+    def go_to_fog(self, direction_in_degrees=None):  # [105,43,107]
         print('Going to fog.')
-        fog_pt = self.find_nearest_fog_on_minimap()
-        if fog_pt is not None:
-            mini_distance, mini_radians = mv.calc_mini_movement(self.app.get_masked_bgr_minimap('wall'),
-                                                                start_pt=self.minimap_center_pt,
-                                                                end_pt=fog_pt)
+        if direction_in_degrees:
+            radians = coord.degrees_to_radians(direction_in_degrees)
             coords = coord.calc_coords(self.app.screen_center_pt,
                                        self.movement_distance,
-                                       mini_radians)
+                                       radians)
             self.app.inputs.left_click_on_coords(coords)
-            self.app.inputs.button_skill('w', coords)
+            self.app.inputs.button_skill('w', coords, variance=self.movement_variance)
             self.action_stack.append(coords)
             time.sleep(self.movement_delay)
             return True
+        else:
+            fog_pt = self.find_nearest_fog_on_minimap()
+            if fog_pt is not None:
+                mini_distance, mini_radians = mv.calc_mini_movement(self.app.get_masked_bgr_minimap('wall'),
+                                                                    start_pt=self.minimap_center_pt,
+                                                                    end_pt=fog_pt)
+                coords = coord.calc_coords(self.app.screen_center_pt,
+                                           self.movement_distance,
+                                           mini_radians)
+                self.app.inputs.left_click_on_coords(coords)
+                self.app.inputs.button_skill('w', coords, variance=self.movement_variance)
+                self.action_stack.append(coords)
+                time.sleep(self.movement_delay)
+                return True
         return False
 
     def get_text_data_on_screen_with(self, hsv_color_filter):
@@ -136,7 +149,7 @@ class POEBot:
         self.app.inputs.open_inventory()
         time.sleep(.5)
         for img in self.images['inventory']['town_portal']:
-            coords = self.find_img_in_screen(img, threshold=.5)
+            coords = self.find_img_in_screen(img, threshold=.6)
             if coords is not None:
                 self.app.inputs.mouse_skill(button='right', coords=coords)
                 self.app.inputs.close_all_menus()
@@ -217,7 +230,7 @@ class POEBot:
                                  self.movement_distance,
                                  radians)
 
-    def go_back_to_waypoint(self, max_moves=25, distance_from_waypoint=50):
+    def go_to_waypoint(self, max_moves=25, distance_from_waypoint=50):
         print('Going back to waypoint.')
         n_moves = 0
         while len(self.action_stack) and n_moves < max_moves:
@@ -227,7 +240,7 @@ class POEBot:
                 if mini_distance and mini_distance <= distance_from_waypoint:
                     return True
                 self.app.inputs.left_click_on_coords(coords)
-                self.app.inputs.button_skill('w', coords)
+                self.app.inputs.button_skill('w', coords, variance=self.movement_variance)
                 self.action_stack.append(coords)
                 time.sleep(self.movement_delay)
             else:
@@ -239,34 +252,36 @@ class POEBot:
         return False
 
     def explore_one_direction(self,
-                              pivot,
+                              # pivot,
                               minimap_pois,
-                              direction=None,
+                              direction_in_degrees=None,
                               item_imgs=None,
                               item_name_set=None,
                               distance_from_poi=50,
                               max_moves=25):
         n_moves = 0
-        while n_moves < max_moves and self.find_any_pts_on_minimap(pivot) is not None:  # stay near pivot
+        # while n_moves < max_moves and self.find_any_pts_on_minimap(pivot) is not None:  # stay near pivot
+        while n_moves < max_moves:
             n_moves += 1
             coords, mini_distance = self.get_coords_and_distance_in_minimap(minimap_pois)
             if coords and mini_distance:
                 if mini_distance <= distance_from_poi:  # we are nearby
                     return True
                 self.app.inputs.left_click_on_coords(coords)
-                self.app.inputs.button_skill('w', coords)  # move towards POI
+                self.app.inputs.button_skill('w', coords, variance=self.movement_variance)  # move towards POI
                 self.action_stack.append(coords)
                 time.sleep(self.movement_delay)
                 if item_imgs:
                     self.pickup_items_by_image_matching(item_imgs)
                 if item_name_set:
                     self.pickup_items_by_text_matching(item_name_set, [0, 255, 254])  # pick up items along the way
-            elif not self.go_to_fog():
+            elif not self.go_to_fog(direction_in_degrees):
                 return False  # failed to find anything
         return False
 
     def wait_for_loading_area(self, max_tries=10):
         n_tries = 0
+        time.sleep(1)
         while not self.find_img_in_screen(self.images['objects']['waypoint'][0]):
             if n_tries >= max_tries:
                 return False
@@ -276,6 +291,7 @@ class POEBot:
 
     def wait_for_world_menu(self, max_tries=10):
         n_tries = 0
+        time.sleep(1)
         while not self.find_img_in_screen(self.images['menu_btns']['world'][0]):
             if n_tries >= max_tries:
                 return False

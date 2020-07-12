@@ -1,3 +1,5 @@
+from random import randrange
+
 class InputHandler():
     def __init__(self, app):
         self._app = app
@@ -27,7 +29,11 @@ class InputHandler():
                              coords=coords,
                              pressed=pressed)
 
-    def button_skill(self, key, coords=(None, None)):
+    def button_skill(self, key, coords=[None, None], variance=None):
+        if variance and coords is not [None, None]:
+            rdm1, rdm2 = randrange(-variance, variance, 25), randrange(-variance, variance, 25)
+            coords[0] += rdm1
+            coords[1] += rdm2
         self._app.move_mouse(coords=coords)
         self._app.send_keystrokes(key)
 
