@@ -7,6 +7,7 @@ from poe.common import movement as mv
 from utils.math import coordinates as coord
 import time
 import cv2
+import numpy as np
 
 
 class POEBot:
@@ -15,9 +16,9 @@ class POEBot:
         self.app = POEApp()
         self.images = ImageFactory.get_images()
         self.movement_distance = 400
-        self.movement_delay = .5
+        self.movement_delay = .4
         self.movement_variance = 100
-        self.pickup_delay = 1.5
+        self.pickup_post_delay = 1.25
         self.minimap_center_pt = (self.app.minimap_cropper.mid_x, self.app.minimap_cropper.mid_y)
         self.n_actions = 0
         self.n_items_picked_up = 0
@@ -79,18 +80,20 @@ class POEBot:
                               text_data['width'][idx],
                               text_data['height'][idx])
                 mid_pt = coord.get_midpoint((x, y), (x + w, y + h))
-                print('pick up: ', text, mid_pt)
-                self.app.inputs.left_click_on_coords(coords=mid_pt)
-                self.action_stack.append(mid_pt)
-                self.n_items_picked_up += 1
-                time.sleep(self.pickup_delay)
+                # print('pick up: ', text, mid_pt)
+                # self.app.inputs.left_click_on_coords(coords=mid_pt)
+                # self.action_stack.append(mid_pt)
+                # self.n_items_picked_up += 1
+                # time.sleep(self.pickup_post_delay)
+                self.pickup_item(mid_pt)
                 return True
         return False
 
-    def pickup_items_by_image_matching(self, imgs):
-        picked_up = False
+    def pickup_items_by_image_matching(self, imgs, max_items=10):
+        picked_up, n_items = False, 0
         for img in imgs:
-            while self.pickup_item_by_image_matching(img):
+            while self.pickup_item_by_image_matching(img) and n_items < max_items:
+                n_items += 1
                 picked_up = True
         return picked_up
 
@@ -98,11 +101,41 @@ class POEBot:
         img_coords = self.find_img_in_screen(img)
         if img_coords:
             print('Picking up item.')
-            self.app.inputs.left_click_on_coords(img_coords)
-            self.action_stack.append(img_coords)  # reset stack
-            time.sleep(self.pickup_delay)
+            # self.app.inputs.left_click_on_coords(img_coords)
+            # self.action_stack.append(img_coords)  # reset stack
+            # time.sleep(self.pickup_post_delay)
+            self.pickup_item(img_coords)
             return True
         return False
+
+    def pickup_items_by_ocr(self, item_set, max_items=10):
+        picked, n_items = False, 0
+        while self.pickup_a_item_by_ocr(item_set) and n_items < max_items:
+            n_items += 1
+            picked = True
+        return picked
+
+    def pickup_a_item_by_ocr(self, item_set):
+        self.app.update_screen()
+        for text, pt1, pt2 in txtf.find_all_box_text_on_screen(self.app.bgr_screen):
+            if len(text) and text[0].isdigit()\
+                    or len(text) >= 2 and text[1].upper() == 'X': # deal with stacks of items
+                text = ' '.join(text.split()[1:])
+            print('Found item: ', text)
+            if text.upper() in item_set:
+                print('Item pickup: ', text)
+                coords = coord.get_centroid(np.array([pt1, pt2]))
+                if self.pickup_item((int(coords[0]), int(coords[1]))):
+                    time.sleep(self.pickup_post_delay)
+                    return True
+        return False
+
+    def pickup_item(self, coords):
+        self.app.inputs.left_click_on_coords(coords=coords)
+        self.action_stack.append(coords)
+        self.n_items_picked_up += 1
+        time.sleep(self.pickup_post_delay)
+        return True
 
     def find_nearest_fog_on_minimap(self):
         self.app.update_screen()
@@ -111,7 +144,7 @@ class POEBot:
         return imgf.nearest_nonzero_idx(self.app.get_masked_bgr_minimap('fog'),
                                         self.minimap_center_pt)
 
-    def go_to_fog(self, direction_in_degrees=None):  # [105,43,107]
+    def take_one_step_to_fog(self, direction_in_degrees=None):  # [105,43,107]
         print('Going to fog.')
         if direction_in_degrees:
             radians = coord.degrees_to_radians(direction_in_degrees)
@@ -194,10 +227,13 @@ class POEBot:
         if waypoint_menu_coords:
             self.app.inputs.left_click_on_coords(waypoint_menu_coords, pressed='control')
             time.sleep(1.5)
-            new_btn_coords = self.find_img_in_screen(self.images['menu_btns']['new_instance_btn'][0])
-            if new_btn_coords:
-                self.app.inputs.left_click_on_coords(new_btn_coords)
-                self.action_stack = list()  # reset stack
+            # new_btn_coords = self.find_img_in_screen(self.images['menu_btns']['new_instance_btn'][0])
+            # if new_btn_coords:
+            #     self.app.inputs.left_click_on_coords(new_btn_coords)
+            #     self.action_stack = list()  # reset stack
+            #     self.is_in_town = False
+            #     return self.wait_for_loading_area()
+            if self.app.try_click_on_image(self.images['menu_btns']['new_instance_btn'][0]) is not None:
                 self.is_in_town = False
                 return self.wait_for_loading_area()
         return False
@@ -230,7 +266,10 @@ class POEBot:
                                  self.movement_distance,
                                  radians)
 
-    def go_to_waypoint(self, max_moves=25, distance_from_waypoint=50):
+    def go_to_waypoint(self,
+                       max_moves=25,
+                       distance_from_waypoint=50,
+                       item_set=None):
         print('Going back to waypoint.')
         n_moves = 0
         while len(self.action_stack) and n_moves < max_moves:
@@ -249,6 +288,8 @@ class POEBot:
                 self.app.inputs.left_click_on_coords(inverse_coords)
                 self.app.inputs.button_skill('w', inverse_coords)
                 time.sleep(self.movement_delay)
+            if item_set:
+                self.pickup_items_by_ocr(item_set)
         return False
 
     def explore_one_direction(self,
@@ -271,22 +312,27 @@ class POEBot:
                 self.app.inputs.button_skill('w', coords, variance=self.movement_variance)  # move towards POI
                 self.action_stack.append(coords)
                 time.sleep(self.movement_delay)
-                if item_imgs:
-                    self.pickup_items_by_image_matching(item_imgs)
-                if item_name_set:
-                    self.pickup_items_by_text_matching(item_name_set, [0, 255, 254])  # pick up items along the way
-            elif not self.go_to_fog(direction_in_degrees):
+                # if item_imgs:
+                #     self.pickup_items_by_image_matching(item_imgs)
+                # if item_name_set:
+                #     self.pickup_items_by_text_matching(item_name_set, [0, 255, 254])  # pick up items along the way
+            elif not self.take_one_step_to_fog(direction_in_degrees):
                 return False  # failed to find anything
+            # if item_imgs:
+            #     self.pickup_items_by_image_matching(item_imgs)
+            if item_name_set:
+                self.pickup_a_item_by_ocr(item_name_set)
         return False
 
     def wait_for_loading_area(self, max_tries=10):
+        self.action_stack = list()  # reset stack
         n_tries = 0
         time.sleep(1)
         while not self.find_img_in_screen(self.images['objects']['waypoint'][0]):
             if n_tries >= max_tries:
                 return False
             n_tries += 1
-            time.sleep(.25)
+            time.sleep(1)
         return True
 
     def wait_for_world_menu(self, max_tries=10):
@@ -298,3 +344,39 @@ class POEBot:
             n_tries += 1
             time.sleep(.25)
         return True
+
+    def find_seed_cache_by_ocr(self):
+        self.app.update_screen()
+        text_data = txtf.find_text_on_screen(self.app.bgr_screen,
+                                             [120, 119, 254],
+                                             offsets=[20, 20, 50])
+        print(text_data['text'])
+        for idx, text in enumerate(text_data['text']):  # pick first item found
+            if 'GROVE' in text or 'SACRED' in text:
+                x, y, w, h = (text_data['left'][idx],
+                              text_data['top'][idx],
+                              text_data['width'][idx],
+                              text_data['height'][idx])
+                mid_pt = coord.get_midpoint((x, y), (x + w, y + h))
+                # print('pick up: ', text, mid_pt)
+                # self.app.inputs.left_click_on_coords(coords=mid_pt)
+                # self.action_stack.append(mid_pt)
+                # self.n_items_picked_up += 1
+                # time.sleep(self.pickup_post_delay)
+                self.pickup_item(mid_pt)
+                return True
+        return False
+
+
+        # picked_up = False
+        # text_data = self.get_text_data_on_screen_with(hsv_color)
+        # items_found = [x for x in text_data['text'] if x in name_set]
+        # print('items: ', items_found)
+        # for _ in range(len(items_found)):
+        #     if self.pickup_item_by_text_matching(text_data, name_set):
+        #         picked_up = True
+        #         # self.app.update_screen()
+        #         # item_mask = conv.get_masked_bgr_img(self.app.bgr_screen, hsv_color)
+        #         # text_data = txtf.find_text_data(item_mask)
+        #         text_data = self.get_text_data_on_screen_with(hsv_color)
+        # return picked_up

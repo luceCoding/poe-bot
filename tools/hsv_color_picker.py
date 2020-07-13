@@ -23,10 +23,13 @@ def main():
     import sys
     global image_hsv, pixel # so we can use it in mouse callback
 
-    #image_src = cv2.imread(sys.argv[1])  # pick.py my.png
+    # image_src = cv2.imread(sys.argv[1])  # pick.py my.png
     screen = App('Path of Exile')
     rgb_screen = screen.get_screen_as_rgb_img()
     image_src = con.rgb_to_bgr(rgb_screen)
+
+    # path = r'C:\Users\Luce\Documents\My Games\Path of Exile\Screenshots\screenshot-0006.png'
+    # image_src = cv2.imread(path)
 
     if image_src is None:
         print ("the image read is None............")

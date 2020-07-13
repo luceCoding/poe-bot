@@ -13,7 +13,10 @@ class ImageFactory(dict):
 
         for p in glob('./images/items/sacred_grove.png'):
             d['items']['grove'].append(cv2.imread(p))
+
         for p in glob('./images/items/seed.png'):
+            d['items']['loot'].append(cv2.imread(p))
+        for p in glob('./images/items/orbs.png'):
             d['items']['loot'].append(cv2.imread(p))
 
         for p in glob('./images/menu/new_instance/*.png'):
@@ -34,6 +37,8 @@ class ImageFactory(dict):
             d['objects']['waypoint'].append(cv2.imread(p))
         for p in glob('./images/objects/highgate/highgate*.png'):
             d['objects']['highgate'].append(cv2.imread(p))
+
+        print(len(d['items']['loot']))
 
         return d
 
