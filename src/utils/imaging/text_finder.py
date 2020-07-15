@@ -1,7 +1,7 @@
 import pytesseract
 import cv2
 from pytesseract import Output
-from utils.imaging import conversions as conv
+from src.utils.imaging import conversions as conv
 from PIL import Image
 
 pytesseract.pytesseract.tesseract_cmd = r'C:\Users\Luce\AppData\Local\Tesseract-OCR\tesseract.exe'

@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
-from utils.screen_capture.app import App
-import utils.imaging.conversions as con
+from src.utils import App
+from src import utils as con
 
 image_hsv = None   # global ;(
 pixel = (20,60,80) # some stupid default
@@ -20,7 +20,6 @@ def pick_color(event,x,y,flags,param):
         cv2.imshow("mask",image_mask)
 
 def main():
-    import sys
     global image_hsv, pixel # so we can use it in mouse callback
 
     # image_src = cv2.imread(sys.argv[1])  # pick.py my.png

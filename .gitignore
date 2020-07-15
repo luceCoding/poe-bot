@@ -1,3 +1,6 @@
 *.pyc
 *__pycache__*
-.idea
+/.idea
+/dist/
+/poe_bot.egg-info/
+/build/

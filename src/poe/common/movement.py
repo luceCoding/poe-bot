@@ -1,4 +1,5 @@
-from utils.math import coordinates as coord
+from src.utils.math import coordinates as coord
+
 
 def calc_mini_movement(masked_bgr_wall_minimap, start_pt, end_pt):
     distance = abs(coord.calc_distance(start_pt, end_pt))

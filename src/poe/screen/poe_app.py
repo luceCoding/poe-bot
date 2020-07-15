@@ -1,10 +1,11 @@
-from utils.screen_capture.app import App
-import utils.imaging.conversions as conv
-from poe.input.input_handler import InputHandler
-from poe.screen.screen_to_minimap import ScreenToMinimap
-from poe.configs.masks import MaskManager
-from utils.imaging import img_finder as imgf
-from utils.math import coordinates as coord
+from src.utils.screen_capture.app import App
+from src.utils.imaging import conversions as conv
+from src.poe.input.input_handler import InputHandler
+from src.poe.screen.screen_to_minimap import ScreenToMinimap
+from src.poe.common.mask_manager import MaskManager
+from src.utils.imaging import img_finder as imgf
+from src.utils.math import coordinates as coord
+
 
 class POEApp:
 

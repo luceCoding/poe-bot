@@ -1,6 +1,5 @@
-from poe.bot import poe_bot
+from src.poe.bot import poe_bot
 import time
-import gc
 
 p = poe_bot.POEBot()
 

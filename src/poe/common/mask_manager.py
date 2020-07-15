@@ -1,9 +1,13 @@
 import yaml
+import pkg_resources
+import os
+
+resource_pkg = pkg_resources.get_distribution('poe_bot').location
 
 class MaskManager(dict):
 
     def __init__(self):
-        with open('./configs/masks.yaml') as f:
+        with open(os.path.join(resource_pkg, './configs/masks.yaml')) as f:
             self.masks = yaml.safe_load(f)
         self.switch = {
             'fog': self.masks['fog_hsv_mask']['mask'],

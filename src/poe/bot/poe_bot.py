@@ -1,9 +1,8 @@
-from poe.screen.poe_app import POEApp
-from utils.imaging import img_finder as imgf
-from utils.imaging import text_finder as txtf
-from poe.screen.image_factory import ImageFactory
-from poe.common import movement as mv
-from utils.math import coordinates as coord
+from src.poe.screen.poe_app import POEApp
+from src.utils.imaging import img_finder as imgf, text_finder as txtf
+from src.poe.screen.image_factory import ImageFactory
+from src.poe.common import movement as mv
+from src.utils.math import coordinates as coord
 import time
 import numpy as np
 

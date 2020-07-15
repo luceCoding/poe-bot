@@ -1,6 +1,6 @@
-from poe.bot import poe_bot
+from src.poe.bot import poe_bot
 from pynput import keyboard
-import yaml
+from src.poe.common.config_manager import ConfigurationManager
 import gc
 
 
@@ -9,9 +9,7 @@ class SeedBot():
     def __init__(self):
         self.bot = poe_bot.POEBot()
         self.break_program = False
-        with open('./configs/items.yaml', 'rt', encoding='utf8') as f:
-            data = yaml.safe_load(f)
-        self.item_set = set([x.upper() for x in data['items']])
+        self.item_set = set([x.upper() for x in ConfigurationManager.get_item_config()['items']])
 
     def start(self):
         with keyboard.Listener(on_press=self.on_press) as listener:
@@ -82,7 +80,3 @@ class SeedBot():
     #             print('success')
     #             return
     #     print('failed')
-
-s = SeedBot()
-# s.test()
-s.start()

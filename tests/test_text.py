@@ -1,10 +1,5 @@
-from utils.screen_capture.app import App
-import utils.imaging.conversions as con
-import utils.imaging.text_finder as tx
-import timeit
-import cv2
-from pprint import pprint
-import numpy as np
+from src.utils import App
+from src import utils as con
 
 screen = App(title='Path of Exile')
 rgb_screen = screen.get_app_rgb_img()

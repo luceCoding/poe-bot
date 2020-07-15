@@ -1,6 +1,4 @@
-import cv2
-from poe.screen.poe_app import POEApp
-import time
+from src.poe.screen.poe_app import POEApp
 
 p = POEApp()
 # print(type(p._app._app))

@@ -1,5 +1,5 @@
 import numpy as np
-from utils.imaging import img_finder as imgf
+from src.utils.imaging import img_finder as imgf
 
 
 class ImageDetector:

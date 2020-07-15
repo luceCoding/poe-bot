@@ -1,15 +1,6 @@
-from utils.screen_capture.app import App
-import utils.imaging.conversions as conv
-import poe.screen.image_detector as imgd
-import timeit
 import cv2
-from pprint import pprint
-import numpy as np
-from PIL import Image
 import pytesseract
 pytesseract.pytesseract.tesseract_cmd = r'C:\Users\Luce\AppData\Local\Tesseract-OCR\tesseract.exe'
-import timeit
-from utils.imaging import text_finder as txtf
 
 # screen = App(title='Path of Exile')
 # rgb_screen = screen.get_screen_as_rgb_img()

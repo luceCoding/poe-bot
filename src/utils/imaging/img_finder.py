@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
-from utils.imaging import conversions as conv
+from src.utils.imaging import conversions as conv
+
 
 def get_template_img_location(source_bgr_img, template_bgr_img, threshold):
     w, h = template_bgr_img.shape[:-1]
