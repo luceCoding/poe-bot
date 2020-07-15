@@ -12,6 +12,7 @@ class InputHandler():
                              pressed=pressed)
 
     def open_inventory(self):
+        self._app.move_mouse()  # avoid text hover's blocking inventory
         self._app.send_keystrokes('{SPACE}i')
 
     def close_all_menus(self):

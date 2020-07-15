@@ -7,7 +7,7 @@ class ScreenToMinimap:
         self.screen_width, self.screen_height = screen_width, screen_height
         self.minimap_width = self.minimap_height = 275
 
-        self.x1, self.y1 = 1650, 45
+        self.x1, self.y1 = 1642, 43
         self.x2 = self.x1 + self.minimap_width
         self.y2 = self.y1 + self.minimap_height
         self.mid_x, self.mid_y = self.minimap_width // 2, self.minimap_height // 2

@@ -12,10 +12,10 @@ class POEBot:
     def __init__(self):
         self.app = POEApp()
         self.images = ImageFactory.get_images()
-        self.movement_distance = 425
+        self.movement_distance = 400
         self.movement_delay = .4
         self.movement_variance = 100
-        self.pickup_post_delay = .25 # based on if the item is right next to character
+        self.pickup_post_delay = .25  # based on if the item is right next to character
         self.minimap_center_pt = (self.app.minimap_cropper.mid_x, self.app.minimap_cropper.mid_y)
         self.n_actions = 0
         self.n_items_picked_up = 0
@@ -83,7 +83,7 @@ class POEBot:
         self.app.update_screen()
         for text, pt1, pt2 in txtf.find_all_box_text_on_screen(self.app.bgr_screen):
             if len(text) >= 2 \
-                    and (text[0].isdigit() or text[1].upper() == 'X'): # deal with stacks of items
+                    and (text[0].isdigit() or text[1].upper() == 'X'):  # deal with stacks of items
                 text = ' '.join([x.strip() for x in text.split(' ')[1:]])
             print('Found item: ', text)
             if text.upper() in item_set:
@@ -96,7 +96,7 @@ class POEBot:
                     coords,
                     sq_unit_size=90,
                     tick_per_sq_unit=.25):
-                    # distance_for_skill=100):
+        # distance_for_skill=100):
         distance = coord.calc_distance(coords, self.app.screen_center_pt)
         # if distance >= 150:
         #     self.app.inputs.button_skill(key='w', coords=coords)
@@ -186,7 +186,6 @@ class POEBot:
                 # center_target_img_pt = coord.get_centroid(img_box)
                 self.app.inputs.left_click_on_coords(img_pt)
                 self.action_stack.append(img_pt)
-                self.n_items_picked_up += 1
                 if self.wait_for_image_on_screen(self.images['menu_btns']['world'][0]):
                     print('Opened world menu')
                     return True
@@ -244,7 +243,7 @@ class POEBot:
                 coords, mini_distance = self.get_coords_and_distance_in_minimap(self.images['minimap']['waypoint'])
                 if coords:
                     if mini_distance and mini_distance <= distance_from_waypoint:
-                        return True # nearby waypoint
+                        return True  # nearby waypoint
                     self.app.inputs.left_click_on_coords(coords)
                     self.app.inputs.button_skill('w', coords, variance=self.movement_variance)
                     self.action_stack.append(coords)
