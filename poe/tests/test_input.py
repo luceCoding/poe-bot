@@ -1,5 +1,5 @@
 import cv2
-from poe.screen.poeapp import POEApp
+from poe.screen.poe_app import POEApp
 import time
 
 p = POEApp()

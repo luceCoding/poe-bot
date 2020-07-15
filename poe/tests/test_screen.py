@@ -1,5 +1,5 @@
 import cv2
-from poe.screen.poeapp import POEApp
+from poe.screen.poe_app import POEApp
 import utils.imaging.conversions as conv
 from pprint import pprint
 import numpy as np

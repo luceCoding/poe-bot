@@ -1,7 +1,7 @@
 from utils.screen_capture.app import App
 import utils.imaging.conversions as conv
-from poe.input.inputhandler import InputHandler
-from poe.screen.minimap import ScreenToMinimap
+from poe.input.input_handler import InputHandler
+from poe.screen.screen_to_minimap import ScreenToMinimap
 from poe.configs.masks import MaskManager
 from utils.imaging import img_finder as imgf
 from utils.math import coordinates as coord
@@ -23,17 +23,20 @@ class POEApp:
         self._minimap_cropper = ScreenToMinimap(w, h)
 
     def update_screen(self):
+        del self.rgb_screen
+        del self.bgr_screen
         self.rgb_screen = self._app.get_screen_as_rgb_img()
         self.bgr_screen = conv.rgb_to_bgr(self.rgb_screen)
 
     @property
     def rgb_minimap(self):
+        del self._rgb_minimap
         self._rgb_minimap = self._minimap_cropper.crop_minimap(self.rgb_screen)
         return self._rgb_minimap
 
     @property
     def bgr_minimap(self):
-        # self._prev_bgr_minimap = self._bgr_minimap
+        del self._bgr_minimap
         self._bgr_minimap = self._minimap_cropper.crop_minimap(self.bgr_screen)
         return self._bgr_minimap
 
@@ -49,8 +52,8 @@ class POEApp:
         pt = self.get_center_point_of_image_in_screen(bgr_img, threshold)
         if pt:
             self.inputs.left_click_on_coords(pt)
-            return pt
-        return None
+            return True
+        return False
 
     def get_center_point_of_image_in_screen(self, bgr_img, threshold=.6):
         self.update_screen()

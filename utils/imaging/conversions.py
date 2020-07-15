@@ -14,5 +14,6 @@ def get_masked_bgr_img(bgr_img, hsv_color, offsets=[10, 10, 40]):
     upper = np.array([hsv_color[0] + offsets[0], hsv_color[1] + offsets[1], hsv_color[2] + offsets[2]])
     lower = np.array([hsv_color[0] - offsets[0], hsv_color[1] - offsets[1], hsv_color[2] - offsets[2]])
     mask = cv2.inRange(hsv_img, lower, upper)
+    del hsv_img
     return cv2.bitwise_and(bgr_img, bgr_img, mask=mask)
 

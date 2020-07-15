@@ -26,6 +26,7 @@ def find_all_box_text_on_screen(bgr_screen):
                                          [145, 255, 117],
                                          offsets=[0, 0, 0])
     gray_img = cv2.cvtColor(masked_bgr, cv2.COLOR_BGR2GRAY)
+    del masked_bgr
     # cv2.imshow("o", gray_img)
     # cv2.waitKey(0)
     cnts = cv2.findContours(gray_img, cv2.RETR_EXTERNAL,
@@ -42,15 +43,18 @@ def find_all_box_text_on_screen(bgr_screen):
             pil_im = Image.fromarray(el)
             pt1 = (x, y)
             pt2 = (x + w, y + h)
-            yield pytesseract.image_to_string(pil_im), pt1, pt2
+            res = pytesseract.image_to_string(pil_im, output_type=Output.STRING), pt1, pt2
+            del el
+            del pil_im
+            yield res
 
 
-def find_text_on_screen(bgr_screen, hsv_color, offsets=None):
-    masked_bgr = conv.get_masked_bgr_img(bgr_screen,
-                                         hsv_color,
-                                         offsets=[10, 10, 40])
-    gray_img = cv2.cvtColor(masked_bgr, cv2.COLOR_BGR2GRAY)
-    # cv2.imshow('gray', gray_img)
-    # cv2.waitKey(0)
-    text_data = find_text_data(gray_img)
-    return text_data
+# def find_text_on_screen(bgr_screen, hsv_color, offsets=None):
+#     masked_bgr = conv.get_masked_bgr_img(bgr_screen,
+#                                          hsv_color,
+#                                          offsets=[10, 10, 40])
+#     gray_img = cv2.cvtColor(masked_bgr, cv2.COLOR_BGR2GRAY)
+#     # cv2.imshow('gray', gray_img)
+#     # cv2.waitKey(0)
+#     text_data = find_text_data(gray_img)
+#     return text_data

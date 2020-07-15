@@ -1,4 +1,3 @@
-# import numpy as np
 from utils.math import coordinates as coord
 
 def calc_mini_movement(masked_bgr_wall_minimap, start_pt, end_pt):
