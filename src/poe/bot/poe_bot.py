@@ -5,6 +5,7 @@ from src.utils.math import coordinates as coord
 import time
 import numpy as np
 from src.poe.screen.image_handler import ImageHandler
+from src.poe.common.menu_handler import MenuNavigator
 
 
 class POEBot:
@@ -16,12 +17,12 @@ class POEBot:
         self.movement_delay = .4
         self.movement_variance = 100
         self.pickup_post_delay = .25  # based on if the item is right next to character
-        # self.minimap_center_pt = (self.app.minimap_handler.mid_x, self.app.minimap_handler.mid_y)
         self.n_actions = 0
         self.n_items_picked_up = 0
         self.action_stack = list()
         self.is_in_town = False
         self.img_handler = ImageHandler(self.app)
+        self.menu_handler = MenuNavigator(self.app)
 
     def pickup_items_by_image_matching(self, imgs, max_items=10):
         picked_up, n_items = False, 0
@@ -71,7 +72,7 @@ class POEBot:
         # if distance >= 150:
         #     self.app.inputs.button_skill(key='w', coords=coords)
         #     return True
-        self.app.inputs.left_click_on_coords(coords=coords)
+        self.app.inputs.click_on_coords(coords=coords)
         self.action_stack.append(coords)
         self.n_items_picked_up += 1
         ticks = (distance + 1) // sq_unit_size
@@ -89,7 +90,7 @@ class POEBot:
             coords = coord.calc_coords(self.app.screen_center_pt,
                                        self.movement_distance,
                                        radians)
-            self.app.inputs.left_click_on_coords(coords)
+            self.app.inputs.click_on_coords(coords=coords)
             self.app.inputs.button_skill('w', coords, variance=self.movement_variance)
             self.action_stack.append(coords)
             time.sleep(self.movement_delay)
@@ -100,7 +101,7 @@ class POEBot:
                 coords = coord.calc_coords(self.app.screen_center_pt,
                                            self.movement_distance,
                                            mini_radians)
-                self.app.inputs.left_click_on_coords(coords)
+                self.app.inputs.click_on_coords(coords=coords)
                 self.app.inputs.button_skill('w', coords, variance=self.movement_variance)
                 self.action_stack.append(coords)
                 time.sleep(self.movement_delay)
@@ -129,33 +130,45 @@ class POEBot:
             coords = self.img_handler.find_img_pt_in_screen(self.images['objects']['highgate'][0])
             if coords is not None:
                 print('Went into town portal.')
-                self.app.inputs.left_click_on_coords(coords)
+                self.app.inputs.click_on_coords(coords=coords)
                 self.is_in_town = True
                 time.sleep(.5)
                 return True
         print('Can\'t find town portal.')
         return False
 
-    def open_nearby_waypoint_world_menu(self):
+    def open_nearby_waypoint_world_menu(self, drop_off=False, drop_order=[]):
         print('Opening world menus.')
-        if self.img_handler.wait_for_image_on_screen(self.images['objects']['waypoint'][0],
-                                                     max_tries=10,
-                                                     threshold=.5):
-            img_pt = self.img_handler.find_img_pt_in_screen(self.images['objects']['waypoint'][0], threshold=.5)
-            if img_pt:
-                # center_target_img_pt = coord.get_centroid(img_box)
-                self.app.inputs.left_click_on_coords(img_pt)
-                self.action_stack.append(img_pt)
-                if self.img_handler.wait_for_image_on_screen(self.images['menu_btns']['world'][0]):
-                    print('Opened world menu')
-                    return True
+        print('n_items: ', self.n_items_picked_up)
+        if drop_off \
+                and self.n_items_picked_up >= 300 \
+                and self.menu_handler.open_object('waypoint'):
+            if self.menu_handler.click_on_menu_btn('hideout'):
+                for obj in drop_order:
+                    if self.menu_handler.open_object(obj):
+                        self.menu_handler.drop_off_all_inventory()
+                        self.app.inputs.close_all_menus()
+                        print('Opened: ', obj)
+                    else:
+                        return False
+                self.n_items_picked_up = 0
+                # go back to instance
+                if self.menu_handler.open_object('waypoint'):
+                    menu_btns = ['part2'] # TODO, add when in part already
+                    for btn in menu_btns:
+                        if not self.menu_handler.click_on_menu_btn(btn):
+                            return False
+                return True
+        elif self.menu_handler.open_object('waypoint'):
+            print('Opened world menu')
+            return True
         return False
 
     def create_new_area_with_world_menu(self, area_menu_btn):
         print('Create new instance.')
         area_menu_coords = self.img_handler.find_img_pt_in_screen(area_menu_btn)
         if area_menu_coords:
-            self.app.inputs.left_click_on_coords(area_menu_coords, pressed='control')
+            self.app.inputs.click_on_coords(coords=area_menu_coords, pressed='control')
             if self.img_handler.wait_for_image_on_screen(self.images['menu_btns']['instance_manager'][0],
                                                          threshold=.7):
                 if self.app.try_click_on_image(self.images['menu_btns']['new_instance_btn'][0]):
@@ -180,7 +193,7 @@ class POEBot:
                 if coords:
                     if mini_distance and mini_distance <= distance_from_waypoint:
                         return True  # nearby waypoint
-                    self.app.inputs.left_click_on_coords(coords)
+                    self.app.inputs.click_on_coords(coords=coords)
                     self.app.inputs.button_skill('w', coords, variance=self.movement_variance)
                     self.action_stack.append(coords)
                     time.sleep(self.movement_delay)
@@ -189,7 +202,7 @@ class POEBot:
                     continue
             prev_coords = self.action_stack.pop()
             inverse_coords = coord.inverse_pts_on_pivot(self.app.screen_center_pt, prev_coords)
-            self.app.inputs.left_click_on_coords(inverse_coords)
+            self.app.inputs.click_on_coords(coords=inverse_coords)
             self.app.inputs.button_skill('w', inverse_coords)
             time.sleep(self.movement_delay)
             if item_set:
@@ -209,7 +222,7 @@ class POEBot:
             if coords and mini_distance:
                 if mini_distance <= distance_from_poi:  # we are nearby
                     return True
-                self.app.inputs.left_click_on_coords(coords)
+                self.app.inputs.click_on_coords(coords=coords)
                 self.app.inputs.button_skill('w', coords, variance=self.movement_variance)  # move towards POI
                 self.action_stack.append(coords)
                 time.sleep(self.movement_delay)

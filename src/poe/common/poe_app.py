@@ -52,7 +52,7 @@ class POEApp:
     def try_click_on_image(self, bgr_img, threshold=.6):
         pt = self.get_center_point_of_image_in_screen(bgr_img, threshold)
         if pt:
-            self.inputs.left_click_on_coords(pt)
+            self.inputs.click_on_coords(coords=pt)
             return True
         return False
 

@@ -51,7 +51,8 @@ class SeedBot():
             if self.bot.go_to_waypoint(max_moves=13,
                                        distance_from_waypoint=30,
                                        item_set=self.item_set):
-                if self.bot.open_nearby_waypoint_world_menu():
+                if self.bot.open_nearby_waypoint_world_menu(drop_off=True,
+                                                            drop_order=['seed_stockpile', 'stash']):
                     if self.bot.create_new_area_with_world_menu(self.bot.images['menu_btns']['quarry'][0]):
                         self.bot.app.inputs.mouse_skill(button='right')  # cast righteous fire
                         return True

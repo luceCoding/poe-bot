@@ -25,7 +25,7 @@ class ImageHandler:
 
     def wait_for_image_on_screen(self,
                                  image,
-                                 retry_delay=.5,
+                                 retry_delay=1,
                                  post_delay=.25,
                                  max_tries=5,
                                  threshold=.6):

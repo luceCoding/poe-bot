@@ -1,4 +1,4 @@
-from src.poe.screen.poe_app import POEApp
+from src.poe.common.poe_app import POEApp
 
 p = POEApp()
 # print(type(p._app._app))

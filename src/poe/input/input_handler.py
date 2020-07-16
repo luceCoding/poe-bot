@@ -4,10 +4,11 @@ class InputHandler():
     def __init__(self, app):
         self._app = app
 
-    def left_click_on_coords(self,
-                             coords=(None, None),
-                             pressed=''): # 'control','shift','alt'
-        self._app.send_click('left',
+    def click_on_coords(self,
+                        mouse='left',
+                        coords=(None, None),
+                        pressed=''): # 'control','shift','alt'
+        self._app.send_click(mouse,
                              coords=coords,
                              pressed=pressed)
 
@@ -25,7 +26,6 @@ class InputHandler():
                     button='left',
                     coords=(None, None),
                     pressed=''):
-        # self._app.move_mouse(coords=coords)
         self._app.send_click(button=button,
                              coords=coords,
                              pressed=pressed)
