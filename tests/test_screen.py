@@ -1,6 +1,4 @@
-import cv2
-from src.poe.screen.poe_app import POEApp
-import numpy as np
+from src.poe.common.poe_app import POEApp
 
 # p = POEApp()
 # p.update_screen()

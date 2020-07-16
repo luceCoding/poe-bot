@@ -1,10 +1,10 @@
 from src.utils.screen_capture.app import App
 from src.utils.imaging import conversions as conv
 from src.poe.input.input_handler import InputHandler
-from src.poe.screen.screen_to_minimap import ScreenToMinimap
 from src.poe.common.mask_manager import MaskManager
 from src.utils.imaging import img_finder as imgf
 from src.utils.math import coordinates as coord
+from src.poe.screen.minimap_handler import MinimapHandler
 
 
 class POEApp:
@@ -19,9 +19,9 @@ class POEApp:
         self._rgb_minimap = None
         self._bgr_minimap = None
 
-        w, h = self.rgb_screen.size
-        self.screen_center_pt = (w // 2, h // 2)
-        self._minimap_cropper = ScreenToMinimap(w, h)
+        self.screen_width, self.screen_height = self.rgb_screen.size
+        self.screen_center_pt = (self.screen_width // 2, self.screen_height // 2)
+        self._minimap_handler = MinimapHandler(self, 400)
 
     def update_screen(self):
         del self.rgb_screen
@@ -32,22 +32,22 @@ class POEApp:
     @property
     def rgb_minimap(self):
         del self._rgb_minimap
-        self._rgb_minimap = self._minimap_cropper.crop_minimap(self.rgb_screen)
+        self._rgb_minimap = self._minimap_handler.crop_minimap(self.rgb_screen)
         return self._rgb_minimap
 
     @property
     def bgr_minimap(self):
         del self._bgr_minimap
-        self._bgr_minimap = self._minimap_cropper.crop_minimap(self.bgr_screen)
+        self._bgr_minimap = self._minimap_handler.crop_minimap(self.bgr_screen)
         return self._bgr_minimap
 
     def get_masked_bgr_minimap(self, mask):
-        return conv.get_masked_bgr_img(self._minimap_cropper.crop_minimap(self.bgr_screen),
+        return conv.get_masked_bgr_img(self._minimap_handler.crop_minimap(self.bgr_screen),
                                        self.mask_mapping[mask])
 
     @property
-    def minimap_cropper(self):
-        return self._minimap_cropper
+    def minimap_handler(self):
+        return self._minimap_handler
 
     def try_click_on_image(self, bgr_img, threshold=.6):
         pt = self.get_center_point_of_image_in_screen(bgr_img, threshold)
