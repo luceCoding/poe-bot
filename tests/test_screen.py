@@ -1,4 +1,4 @@
-from src.poe.common.poe_app import POEApp
+from src.poe.controls.poe_app import POEApp
 
 # p = POEApp()
 # p.update_screen()
@@ -16,7 +16,7 @@ from src.poe.common.poe_app import POEApp
 # cv2.waitKey(0)
 # cv2.destroyAllWindows()
 
-p = POEApp()
-p.update_screen()
-p.rgb_screen.show()
-p.rgb_minimap.show()
+# p = POEApp()
+# p.update_screen()
+# p.rgb_screen.show()
+# p.rgb_minimap.show()

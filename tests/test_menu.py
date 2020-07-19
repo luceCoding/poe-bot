@@ -1,6 +1,3 @@
-from src.poe.common.poe_app import POEApp
-from src.poe.common.menu_handler import MenuNavigator
-import time
 from src.poe.bot.poe_bot import POEBot
 
 # p = POEApp()
