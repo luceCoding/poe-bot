@@ -1,5 +1,7 @@
 from random import randrange
+from singleton_decorator import singleton
 
+@singleton
 class InputHandler():
     def __init__(self, app):
         self._app = app
@@ -7,7 +9,7 @@ class InputHandler():
     def click_on_coords(self,
                         mouse='left',
                         coords=(None, None),
-                        pressed=''): # 'control','shift','alt'
+                        pressed=''):  # 'control','shift','alt'
         self._app.send_click(mouse,
                              coords=coords,
                              pressed=pressed)
@@ -30,13 +32,12 @@ class InputHandler():
                              coords=coords,
                              pressed=pressed)
 
-    def button_skill(self, key, coords=[None, None], variance=None):
-        if variance and coords is not [None, None]:
+    def button_skill(self, key, coords=(None, None), variance=None):
+        if variance and coords is not None:
             rdm1, rdm2 = randrange(-variance, variance, 25), randrange(-variance, variance, 25)
-            coords[0] += rdm1
-            coords[1] += rdm2
-        self._app.move_mouse(coords=coords)
-        self._app.send_keystrokes(key)
+            new_coords = (map(sum, zip(coords, (rdm1, rdm2))))
+            self._app.move_mouse(coords=new_coords)
+            self._app.send_keystrokes(key)
 
     def flask1(self):
         self._app.send_keystrokes('1')
@@ -53,8 +54,8 @@ class InputHandler():
     def flask5(self):
         self._app.send_keystrokes('5')
 
-    def zoom_map(self):
-        return  # TODO
-
-    def zoom_out_map(self):
-        return  # TODO
+    # def zoom_map(self):
+    #     return  # TODO
+    #
+    # def zoom_out_map(self):
+    #     return  # TODO

@@ -1,6 +1,6 @@
 import cv2
 import numpy as np
-from src.utils.screen_capture.app import App
+from src.lib.screen_capture.app import App
 from src.utils.imaging import conversions as con
 
 image_hsv = None   # global ;(

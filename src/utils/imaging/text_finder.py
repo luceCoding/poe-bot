@@ -21,8 +21,8 @@ def find_text_strings(bgr_img):
     return pytesseract.image_to_string(bgr_img)
 
 
-def find_all_box_text_on_screen(bgr_screen):
-    masked_bgr = conv.get_masked_bgr_img(bgr_screen,
+def find_all_box_text_on_image(bgr_image):
+    masked_bgr = conv.get_masked_bgr_img(bgr_image,
                                          [145, 255, 117],
                                          offsets=[0, 0, 0])
     gray_img = cv2.cvtColor(masked_bgr, cv2.COLOR_BGR2GRAY)
@@ -47,6 +47,8 @@ def find_all_box_text_on_screen(bgr_screen):
             del el
             del pil_im
             yield res
+    del gray_img
+    del cnts
 
 
 # def find_text_on_screen(bgr_screen, hsv_color, offsets=None):

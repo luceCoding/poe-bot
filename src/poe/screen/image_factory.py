@@ -8,7 +8,7 @@ resource_pkg = pkg_resources.get_distribution('poe_bot').location
 img_dir = os.path.join(resource_pkg, 'resources/images')
 
 
-class ImageFactory(dict):
+class ImageFactory:
 
     @staticmethod
     def get_images():

@@ -2,7 +2,7 @@ import math
 
 def calc_coords(start_pt, distance, radians): #assumes x,y is (0,0)
     x, y = start_pt
-    return [int(x + distance*math.cos(radians)), int(y + distance*math.sin(radians))]
+    return (int(x + distance*math.cos(radians)), int(y + distance*math.sin(radians)))
 
 def calc_angle(source, target):
     sx, sy = source
