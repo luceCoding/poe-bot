@@ -2,6 +2,7 @@ from src.utils.imaging import img_finder as imgf
 from src.utils.math import coordinates as coord
 from singleton_decorator import singleton
 import time
+import logging
 
 
 @singleton
@@ -17,6 +18,7 @@ class ImageHandler:
                                  max_tries=10,
                                  threshold=.6):
         for _ in range(max_tries):
+            logging.debug('Waiting for image: {}'.format(_))
             if self.get_center_point_of_image_in_screen(bgr_img,
                                                         threshold=threshold):
                 return True

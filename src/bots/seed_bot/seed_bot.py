@@ -4,7 +4,6 @@ from src.poe.common.navigation import waypoint
 from src.poe.common.navigation import world_menu
 import gc
 import logging
-from pynput import keyboard
 
 
 class SeedBot(POEBot):
@@ -12,26 +11,14 @@ class SeedBot(POEBot):
     def __init__(self):
         super(SeedBot, self).__init__()
         self.item_set = set([x.upper() for x in ConfigurationManager.get_item_config()['items']])
-        self.break_program = False
-
-    def on_press(self, key):
-        if key == keyboard.Key.end:
-            print('end pressed')
-            self.break_program = True
-            return False
 
     def run(self):
-        with keyboard.Listener(on_press=self.on_press) as listener:
-            while self.break_program is False:
-                with waypoint(self):
-                    self.buff_up()
-                    self.find_seeds()
-                self.restart_instance()
-                logging.debug('Garbage: {}'.format(gc.garbage))
-                logging.debug('Tracked objects: {}'.format(*gc.get_objects()))
-                # print(sys._debugmallocstats())
-                gc.collect()
-        listener.join()
+        with waypoint(self):
+            self.buff_up()
+            self.find_seeds()
+        self.restart_instance()
+        logging.debug('Garbage: {}'.format(gc.garbage))
+        logging.debug('Tracked objects: {}'.format(*gc.get_objects()))
 
     def buff_up(self):
         self.app.inputs.mouse_skill(button='right')  # cast righteous fire

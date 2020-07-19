@@ -2,8 +2,8 @@ import yaml
 import pkg_resources
 import os
 
-
 resource_pkg = pkg_resources.get_distribution('poe_bot').location
+
 
 class ConfigurationManager:
 

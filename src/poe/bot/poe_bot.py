@@ -21,16 +21,16 @@ class POEBot(metaclass=ABCMeta):
         self.movement_variance = 100
         self.pickup_post_delay = .25  # based on if the item is right next to character
         self.n_actions = 0
-        self.n_items_picked_up = 299
+        self.n_items_picked_up = 0
         self.action_stack = list()
         self.is_in_town = False
         self.menu_handler = MenuNavigator(self.app)
         self.obj_handler = ObjectHandler(self.app)
         self.movement_key = 'w'
 
-    # @abstractmethod
-    # def run(self):
-    #     raise NotImplementedError
+    @abstractmethod
+    def run(self):
+        raise NotImplementedError
 
     @abstractmethod
     def buff_up(selfs):
@@ -125,6 +125,7 @@ class POEBot(metaclass=ABCMeta):
         logging.info('Going into town portal.')
         if self.app.click_on_image_and_wait_for(self.images['objects']['highgate'][0],
                                                 self.images['objects']['waypoint'][0]):
+            del self.action_stack
             self.action_stack = list()
             logging.info('Returned to town.')
             return True
@@ -135,8 +136,11 @@ class POEBot(metaclass=ABCMeta):
         logging.info('Create new instance.')
         if self.app.click_on_image_and_wait_for(area_menu_btn,
                                                 self.images['menu_btns']['instance_manager'][0]):
-            return self.app.click_on_image_and_wait_for(self.images['menu_btns']['new_instance_btn'][0],
-                                                        self.images['objects']['waypoint'][0])
+            if self.app.click_on_image_and_wait_for(self.images['menu_btns']['new_instance_btn'][0],
+                                                    self.images['objects']['waypoint'][0]):
+                del self.action_stack
+                self.action_stack = list()
+                return True
         return False
 
     def go_to_waypoint(self,

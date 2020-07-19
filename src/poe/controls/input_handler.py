@@ -35,10 +35,9 @@ class InputHandler():
     def button_skill(self, key, coords=(None, None), variance=None):
         if variance and coords is not None:
             rdm1, rdm2 = randrange(-variance, variance, 25), randrange(-variance, variance, 25)
-            coords[0] += rdm1
-            coords[1] += rdm2
-        self._app.move_mouse(coords=coords)
-        self._app.send_keystrokes(key)
+            new_coords = (map(sum, zip(coords, (rdm1, rdm2))))
+            self._app.move_mouse(coords=new_coords)
+            self._app.send_keystrokes(key)
 
     def flask1(self):
         self._app.send_keystrokes('1')

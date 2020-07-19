@@ -17,6 +17,12 @@ class App:
         self._DWMWA_EXTENDED_FRAME_BOUNDS = 9
         self._byref_rect = ctypes.byref(self._rect)
         self._sizeof_rect = ctypes.sizeof(self._rect)
+        ctypes.windll.dwmapi.DwmGetWindowAttribute(
+            wintypes.HWND(win32gui.FindWindow(None, self._window_title)),
+            wintypes.DWORD(self._DWMWA_EXTENDED_FRAME_BOUNDS),
+            self._byref_rect,
+            self._sizeof_rect
+        )
 
     def get_screen_as_rgb_img(self):
         self._hwin.set_focus()

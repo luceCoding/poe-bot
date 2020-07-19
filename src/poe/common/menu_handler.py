@@ -21,19 +21,6 @@ class MenuNavigator:
         }
 
     def click_on_menu_btn(self, btn_name):
-        # switch = {
-        #     'hideout': self.menu_images['hideout'],
-        #     'part1': self.menu_images['part1'],
-        #     'part2': self.menu_images['part2'],
-        #     'epi': self.menu_images['epilogue'],
-        #     '6': self.menu_images['act6'],
-        #     '7': self.menu_images['act7'],
-        #     '8': self.menu_images['act8'],
-        #     '9': self.menu_images['act9'],
-        #     '10': self.menu_images['act10'],
-        #     'quarry': self.menu_images['quarry'],
-        # }
-        # self._app.update_screen()
         img_box = imgf.get_template_img_location(self._app.bgr_screen,
                                                  self.menu_btn_switch[btn_name],
                                                  threshold=.95)
