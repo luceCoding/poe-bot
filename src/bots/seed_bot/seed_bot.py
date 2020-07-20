@@ -37,7 +37,8 @@ class SeedBot(POEBot):
         return False
 
     def restart_instance(self):
-        return self.create_new_area_with_world_menu(self.images['menu_btns']['quarry'][0])
+        with world_menu(self):
+            return self.create_new_area_with_world_menu(self.images['menu_btns']['quarry'][0])
 
     def get_out_of_jail(self):
         if self.open_town_portal():

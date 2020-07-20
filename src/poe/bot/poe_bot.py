@@ -9,7 +9,6 @@ from src.poe.common.object_handler import ObjectHandler
 from src.poe.common.navigation import inventory
 from abc import ABCMeta, abstractmethod
 import logging
-from src.poe.common.navigation import world_menu
 
 
 class POEBot(metaclass=ABCMeta):
@@ -135,18 +134,13 @@ class POEBot(metaclass=ABCMeta):
 
     def create_new_area_with_world_menu(self, area_menu_btn):
         logging.info('Create new instance.')
-        with world_menu(self):
-            self.menu_handler.click_on_world_menu_btn('part2')
-            time.sleep(.25)
-            self.menu_handler.click_on_world_menu_btn('act9')
-            time.sleep(.25)
-            if self.app.click_on_image_and_wait_for(area_menu_btn,
-                                                    self.images['menu_btns']['instance_manager'][0]):
-                if self.app.click_on_image_and_wait_for(self.images['menu_btns']['new_instance_btn'][0],
-                                                        self.images['objects']['waypoint'][0]):
-                    del self.action_stack
-                    self.action_stack = list()
-                    return True
+        if self.app.click_on_image_and_wait_for(area_menu_btn,
+                                                self.images['menu_btns']['instance_manager'][0]):
+            if self.app.click_on_image_and_wait_for(self.images['menu_btns']['new_instance_btn'][0],
+                                                    self.images['objects']['waypoint'][0]):
+                del self.action_stack
+                self.action_stack = list()
+                return True
         return False
 
     def go_to_waypoint(self,
@@ -200,15 +194,3 @@ class POEBot(metaclass=ABCMeta):
             if item_name_set:
                 self.pickup_a_item_by_ocr(item_name_set)
         return False
-
-    def drop_off_inventory_items(self):
-        with world_menu(self):
-            if not self.menu_handler.click_on_world_menu_btn('hideout'):
-                return False
-        actions = [self.obj_handler.open_object('seed_stockpile'),
-                   self.menu_handler.drop_off_all_inventory(),
-                   self.app.inputs.close_all_menus(),
-                   self.obj_handler.open_object('stash'),
-                   self.menu_handler.drop_off_all_inventory(),
-                   self.app.inputs.close_all_menus()]
-        return all(actions)

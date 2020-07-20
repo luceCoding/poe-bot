@@ -32,14 +32,6 @@ def begin():
     s = SeedBot()
     s.run()
 
-def drop_off():
-    log_format = '[%(asctime)s] [%(levelname)s] - %(message)s'
-    logging.basicConfig(level=logging.INFO, format=log_format)
-
-    s = SeedBot()
-    s.drop_off_inventory_items()
-    s.restart_instance()
-
 def on_press(key):
     global break_program
     if key == keyboard.Key.end:
@@ -50,16 +42,9 @@ def on_press(key):
 
 if __name__ == "__main__":
     break_program = False
-    n_runs = 0
     with keyboard.Listener(on_press=on_press) as listener:
         while break_program is False:
-            n_runs += 1
-            if (n_runs % 500) == 0:
-                p = Process(target=drop_off)
-                p.start()
-                p.join()
-            else:
-                p = Process(target=begin)
-                p.start()
-                p.join()
+            p = Process(target=begin)
+            p.start()
+            p.join()
         listener.join()
