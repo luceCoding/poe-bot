@@ -27,9 +27,10 @@ def is_expired():
 
 def begin():
     log_format = '[%(asctime)s] [%(levelname)s] - %(message)s'
-    logging.basicConfig(level=logging.INFO, format=log_format)
+    logging.basicConfig(level=logging.DEBUG, format=log_format)
 
     s = SeedBot()
+    # s.restart_instance()
     s.run()
 
 def drop_off():

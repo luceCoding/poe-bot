@@ -27,12 +27,14 @@ class ImageFactory:
         for p in glob(os.path.join(img_dir, 'menu/inventory/inventory.png')):
             d['menu_btns']['inventory'].append(cv2.imread(p))
 
-        for p in glob(os.path.join(img_dir, 'minimap/player/*.png')):
-            d['minimap']['player'].append(cv2.imread(p))
-        for p in glob(os.path.join(img_dir, 'minimap/seed/*.png')):
+        # for p in glob(os.path.join(img_dir, 'minimap/player/*.png')):
+        #     d['minimap']['player'].append(cv2.imread(p))
+        for p in glob(os.path.join(img_dir, 'minimap/seed/seed*.png')):
             d['minimap']['seed'].append(cv2.imread(p))
         for p in glob(os.path.join(img_dir, 'minimap/waypoint/*.png')):
             d['minimap']['waypoint'].append(cv2.imread(p))
+        # _ = os.path.join(img_dir, 'menu/stash/stash_obj.png')
+        # d['minimap']['stash'].append(cv2.imread(_))
 
         for p in glob(os.path.join(img_dir, 'objects/waypoint/*.png')):
             d['objects']['waypoint'].append(cv2.imread(p))
@@ -42,6 +44,8 @@ class ImageFactory:
             d['objects']['grove'].append(cv2.imread(p))
         for p in glob(os.path.join(img_dir, 'objects/quarry/quarry.png')):
             d['objects']['quarry'].append(cv2.imread(p))
+        for p in glob(os.path.join(img_dir, 'objects/stash/stash.png')):
+            d['objects']['stash'].append(cv2.imread(p))
         return d
 
     @staticmethod
@@ -78,6 +82,12 @@ class ImageFactory:
         d['part2'] = cv2.imread(_)
         _ = os.path.join(img_dir, 'menu/world/epilogue.png')
         d['epilogue'] = cv2.imread(_)
+
+        _ = os.path.join(img_dir, 'menu/character_selection/character_selection.png')
+        d['character_selection'] = cv2.imread(_)
+        _ = os.path.join(img_dir, 'menu/character_selection/play.png')
+        d['play'] = cv2.imread(_)
+
         return d
 
     @staticmethod

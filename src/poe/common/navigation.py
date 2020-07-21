@@ -2,20 +2,21 @@ from contextlib import contextmanager
 
 
 @contextmanager
-def waypoint(bot):
+def waypoint(bot, movement_delay=None):
     try:
-        if not bot.go_to_waypoint():
+        if not bot.go_to_waypoint(movement_delay=movement_delay):
             raise Warning('Can\'t find waypoint')
         yield
     finally:
-        if not bot.go_to_waypoint():
-            if not bot.get_out_of_jail():
-                raise Warning('Stuck. Help!')
+        return
+        # if not bot.go_to_waypoint():
+        #     if not bot.get_out_of_jail():
+        #         raise Warning('Stuck. Help!')
 
 @contextmanager
-def world_menu(bot):
+def world_menu(bot, movement_delay=None):
     try:
-        with waypoint(bot):
+        with waypoint(bot, movement_delay=movement_delay):
             if not bot.obj_handler.open_object('waypoint'):
                 raise Warning('Can\'t open waypoint menu.')
             yield

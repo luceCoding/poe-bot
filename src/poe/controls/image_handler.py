@@ -13,7 +13,7 @@ class ImageHandler:
 
     def wait_for_image_on_screen(self,
                                  bgr_img,
-                                 retry_delay=1,
+                                 retry_delay=.5,
                                  post_delay=.25,
                                  max_tries=10,
                                  threshold=.6):

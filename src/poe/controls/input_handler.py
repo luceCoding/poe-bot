@@ -2,17 +2,20 @@ from random import randrange
 from singleton_decorator import singleton
 
 @singleton
-class InputHandler():
+class InputHandler:
     def __init__(self, app):
         self._app = app
 
     def click_on_coords(self,
                         mouse='left',
                         coords=(None, None),
-                        pressed=''):  # 'control','shift','alt'
+                        pressed='',
+                        double=False):  # 'control','shift','alt'
+        self._app.move_mouse(coords=coords)
         self._app.send_click(mouse,
                              coords=coords,
-                             pressed=pressed)
+                             pressed=pressed,
+                             double=double)
 
     def open_inventory(self):
         self._app.move_mouse()  # avoid text hover's blocking inventory
@@ -53,6 +56,9 @@ class InputHandler():
 
     def flask5(self):
         self._app.send_keystrokes('5')
+
+    def open_esc_menu(self):
+        self._app.send_keystrokes('{ESC}')
 
     # def zoom_map(self):
     #     return  # TODO

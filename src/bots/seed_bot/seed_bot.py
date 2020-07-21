@@ -1,8 +1,6 @@
 from src.poe.bot.poe_bot import POEBot
 from src.poe.common.config_manager import ConfigurationManager
 from src.poe.common.navigation import waypoint
-from src.poe.common.navigation import world_menu
-import gc
 import logging
 
 
@@ -17,8 +15,6 @@ class SeedBot(POEBot):
             self.buff_up()
             self.find_seeds()
         self.restart_instance()
-        logging.debug('Garbage: {}'.format(gc.garbage))
-        logging.debug('Tracked objects: {}'.format(*gc.get_objects()))
 
     def buff_up(self):
         self.app.inputs.mouse_skill(button='right')  # cast righteous fire
@@ -30,23 +26,24 @@ class SeedBot(POEBot):
                                           direction_in_degrees=direction_in_degrees,
                                           item_name_set=self.item_set,
                                           distance_from_poi=25,
-                                          max_moves=6):
+                                          max_moves=5):
                 if self.pickup_item_by_image_matching(self.images['objects']['grove'][0]):
                     if self.pickup_items_by_ocr(item_set=self.item_set, max_items=7):
                         return True  # done, found all the seeds
         return False
 
     def restart_instance(self):
-        return self.create_new_area_with_world_menu(self.images['menu_btns']['quarry'][0])
+        if self.menu_handler.click_on_esc_menu_btn('character_selection'):
+            logging.info('Open character selection.')
+            self.action_stack = list()
+            if self.menu_handler.click_on_character_menu_btn('play'):
+                logging.info('Play character.')
+                if self.app.imaging.wait_for_image_on_screen(self.images['objects']['stash'][0]):
+                    if self.move_to_direction(direction_in_degrees=270):
+                        return self.create_new_area_with_world_menu(self.images['menu_btns']['quarry'][0])
+        return False
 
     def get_out_of_jail(self):
         if self.open_town_portal():
             return self.go_into_town_portal()
         return False
-
-    # def test(self):
-    #     with keyboard.Listener(on_press=self.on_press) as listener:
-    #         while not self.break_program:
-    #             self.pickup_items_by_ocr(item_set=self.item_set, max_items=7)
-    #             gc.collect()
-    #     listener.join()
