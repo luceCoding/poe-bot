@@ -60,7 +60,6 @@ class POEApp:
         return self._bgr_minimap
 
     def get_masked_bgr_minimap(self, mask):
-        # cropped = self._minimap_handler.crop_minimap(self.bgr_screen)
         result = conv.get_masked_bgr_img(self.bgr_minimap,
                                          self.mask_mapping[mask])
         return result
@@ -69,10 +68,11 @@ class POEApp:
     def minimap_handler(self):
         return self._minimap_handler
 
-    def click_on_image_once(self, bgr_img, mouse='left', threshold=.6):
+    def click_on_image_once(self, bgr_img, mouse='left', threshold=.6, pressed=''):
         pt = self.imaging.get_center_point_of_image_in_screen(bgr_img, threshold)
         if pt:
-            self.inputs.click_on_coords(mouse=mouse, coords=pt, pressed='control')
+            # self.inputs.move_mouse(coords=pt)
+            self.inputs.click_on_coords(mouse=mouse, coords=pt, pressed=pressed, double=True)
             return True
         return False
 
@@ -83,9 +83,10 @@ class POEApp:
                                     max_tries=5,
                                     delay=1,
                                     first_threshold=.6,
-                                    second_threshold=.6):
+                                    second_threshold=.6,
+                                    pressed=''):
         for _ in range(max_tries):
-            self.click_on_image_once(first_bgr_img, mouse, first_threshold)
+            self.click_on_image_once(first_bgr_img, mouse, first_threshold, pressed=pressed)
             time.sleep(delay)
             if self.imaging.get_center_point_of_image_in_screen(second_bgr_img,
                                                                 threshold=second_threshold) is not None:

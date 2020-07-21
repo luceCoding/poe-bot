@@ -55,11 +55,11 @@ class MinimapHandler:
         box_pts = self.find_any_pts_on_minimap(imgs, threshold)
         if box_pts is not None:  # found target
             center_img_pt = coord.get_centroid(box_pts)
-            masked_bgr_minimap = self.app.get_masked_bgr_minimap('wall')
-            mini_distance, mini_radians = mv.calc_mini_movement(masked_bgr_minimap,
+            # masked_bgr_minimap = self.app.get_masked_bgr_minimap('wall') # TODO
+            mini_distance, mini_radians = mv.calc_mini_movement(self.app.bgr_minimap,
                                                                 start_pt=self.minimap_center_pt,
                                                                 end_pt=center_img_pt)
-            del masked_bgr_minimap
+            # del masked_bgr_minimap
             coords = coord.calc_coords(self.app.screen_center_pt,  # TODO: decouple
                                        self.movement_distance,
                                        mini_radians)

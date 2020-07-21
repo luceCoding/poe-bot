@@ -27,7 +27,7 @@ def is_expired():
 
 def begin():
     log_format = '[%(asctime)s] [%(levelname)s] - %(message)s'
-    logging.basicConfig(level=logging.INFO, format=log_format)
+    logging.basicConfig(level=logging.DEBUG, format=log_format)
 
     s = SeedBot()
     s.run()
@@ -37,8 +37,7 @@ def drop_off():
     logging.basicConfig(level=logging.INFO, format=log_format)
 
     s = SeedBot()
-    s.drop_off_inventory_items()
-    s.restart_instance()
+    s.drop_off()
 
 def on_press(key):
     global break_program

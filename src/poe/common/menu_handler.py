@@ -1,6 +1,7 @@
 from src.poe.screen.image_factory import ImageFactory
 from src.utils.imaging import img_finder as imgf
 from src.utils.math import coordinates as coord
+import logging
 
 
 class MenuNavigator:
@@ -19,6 +20,12 @@ class MenuNavigator:
             'act10': self.menu_images['act10'],
             'quarry': self.menu_images['quarry'],
         }
+        self.esc_btn_switch = {
+            'character_selection': self.menu_images['character_selection'],
+        }
+        self.character_selection_switch = {
+            'play': self.menu_images['play']
+        }
 
     def click_on_world_menu_btn(self, btn_name):
         img_box = imgf.get_template_img_location(self._app.bgr_screen,
@@ -30,10 +37,37 @@ class MenuNavigator:
             return True
         return False
 
+    def click_on_esc_menu_btn(self, btn_name, max_tries=5):
+        logging.info('Open ESC menu.')
+        for _ in range(max_tries):
+            self._app.inputs.open_esc_menu()
+            if self._app.imaging.wait_for_image_on_screen(self.esc_btn_switch[btn_name],
+                                                          threshold=.7):
+                self._app.click_on_image_once(self.esc_btn_switch[btn_name],
+                                              threshold=.7)
+                if not self._app.imaging.wait_for_image_on_screen(self.esc_btn_switch[btn_name],
+                                                                  max_tries=1,
+                                                                  threshold=.7):
+                    return True
+            self._app.inputs.close_all_menus()
+        return False
+
+    def click_on_character_menu_btn(self, btn_name, max_tries=5):
+        for _ in range(max_tries):
+            if self._app.imaging.wait_for_image_on_screen(self.character_selection_switch[btn_name],
+                                                          threshold=.7):
+                self._app.click_on_image_once(self.character_selection_switch[btn_name],
+                                              threshold=.7)
+                if not self._app.imaging.wait_for_image_on_screen(self.character_selection_switch[btn_name],
+                                                                  max_tries=1,
+                                                                  threshold=.7):
+                    return True
+        return False
+
     def drop_off_all_inventory(self):
         if self._app.imaging.wait_for_image_on_screen(self.menu_images['inventory']):
-            r, c = 5, 11
-            start_pt, end_pt = 1350, 650 # only works for 1920x1080
+            r, c = 5, 12
+            start_pt, end_pt = 1300, 650  # only works for 1920x1080
             interval = 55
             for col in range(c):
                 for row in range(r):
