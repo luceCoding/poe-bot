@@ -37,11 +37,18 @@ class App:
     def send_keystrokes(self, keys):
         self._app_window.send_keystrokes(keys)
 
-    def send_click(self, button, coords=(None, None), pressed='', double=False):
+    def send_click(self, button,
+                   coords=(None, None),
+                   pressed='',
+                   double=False,
+                   button_down=True,
+                   button_up=True):
         self._app_window.click_input(button,
                                      coords=coords,
                                      pressed=pressed,
-                                     double=double)
+                                     double=double,
+                                     button_down=button_down,
+                                     button_up=button_up)
 
     def move_mouse(self, coords=(None, None)):
         self._app_window.click_input('move',

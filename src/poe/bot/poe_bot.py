@@ -19,7 +19,7 @@ class POEBot(metaclass=ABCMeta):
         self.images = ImageFactory.get_images()
         self.movement_distance = 400
         self.movement_delay = .4
-        self.movement_variance = 50
+        self.movement_variance = 75
         self.pickup_post_delay = .25  # based on if the item is right next to character
         self.n_actions = 0
         self.n_items_picked_up = 0
@@ -38,6 +38,7 @@ class POEBot(metaclass=ABCMeta):
         raise NotImplementedError
 
     def pickup_item_by_image_matching(self, img):
+        logging.debug('Pick up item by image matching.')
         img_coords = self.app.imaging.get_center_point_of_image_in_screen(img)
         if img_coords:
             self.pickup_item(img_coords)
@@ -90,12 +91,12 @@ class POEBot(metaclass=ABCMeta):
                 coords = coord.calc_coords(self.app.screen_center_pt,
                                            self.movement_distance,
                                            mini_radians)
-                self.app.inputs.click_on_coords(coords=coords)
                 self.app.inputs.button_skill(self.movement_key,
                                              coords,
                                              variance=self.movement_variance)
+                self.app.inputs.click_on_coords(coords=coords, button_up=False, button_down=True)
                 self.action_stack.append(coords)
-                time.sleep(self.movement_delay)
+                # time.sleep(self.movement_delay)
                 return True
         return False
 
@@ -105,12 +106,13 @@ class POEBot(metaclass=ABCMeta):
         coords = coord.calc_coords(self.app.screen_center_pt,
                                    self.movement_distance,
                                    radians)
-        self.app.inputs.click_on_coords(mouse='middle', coords=coords, double=True)
+        # self.app.inputs.click_on_coords(mouse='middle', coords=coords, double=True)
         self.app.inputs.button_skill(self.movement_key,
                                      coords,
                                      variance=self.movement_variance)
+        self.app.inputs.click_on_coords(mouse='middle', coords=coords)
         self.action_stack.append(coords)
-        time.sleep(self.movement_delay)
+        # time.sleep(self.movement_delay)
         return True
 
     def open_town_portal(self):
@@ -155,7 +157,7 @@ class POEBot(metaclass=ABCMeta):
 
     def go_to_waypoint(self,
                        max_moves=15,
-                       distance_from_waypoint=25,
+                       distance_from_waypoint=30,
                        movement_delay=None):
         if movement_delay is None:
             movement_delay = self.movement_delay
@@ -193,15 +195,17 @@ class POEBot(metaclass=ABCMeta):
             coords, mini_distance = self.app.minimap_handler.get_coords_and_distance_in_minimap(minimap_pois)
             if coords is not None and mini_distance is not None:
                 if mini_distance <= distance_from_poi:
+                    # self.app.inputs.click_on_coords() # stay
                     return True  # we are nearby poi
-                self.app.inputs.click_on_coords(coords=coords, double=True)
+                self.app.inputs.click_on_coords(coords=coords)
                 self.app.inputs.button_skill(self.movement_key,
                                              coords,
                                              variance=self.movement_variance)  # move towards POI
+                # self.app.inputs.click_on_coords(coords=coords, button_up=False, button_down=True)
                 self.action_stack.append(coords)
                 time.sleep(self.movement_delay)
             elif not self.take_one_step_to_fog(direction_in_degrees):
-                return False  # failed to find anything
+                return False  # can't step into fog
             if item_name_set:
                 self.pickup_a_item_by_ocr(item_name_set)
         return False

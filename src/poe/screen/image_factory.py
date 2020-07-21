@@ -29,7 +29,7 @@ class ImageFactory:
 
         # for p in glob(os.path.join(img_dir, 'minimap/player/*.png')):
         #     d['minimap']['player'].append(cv2.imread(p))
-        for p in glob(os.path.join(img_dir, 'minimap/seed/seed*.png')):
+        for p in glob(os.path.join(img_dir, 'minimap/seed/seed[2-3].png')):
             d['minimap']['seed'].append(cv2.imread(p))
         for p in glob(os.path.join(img_dir, 'minimap/waypoint/*.png')):
             d['minimap']['waypoint'].append(cv2.imread(p))

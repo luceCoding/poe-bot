@@ -1,4 +1,5 @@
 from contextlib import contextmanager
+import logging
 
 
 @contextmanager
@@ -9,9 +10,6 @@ def waypoint(bot, movement_delay=None):
         yield
     finally:
         return
-        # if not bot.go_to_waypoint():
-        #     if not bot.get_out_of_jail():
-        #         raise Warning('Stuck. Help!')
 
 @contextmanager
 def world_menu(bot, movement_delay=None):
@@ -31,3 +29,14 @@ def inventory(bot):
         yield
     finally:
         bot.app.inputs.close_all_menus()
+
+@contextmanager
+def main_rotation(bot):
+    try:
+        if bot.app.imaging.wait_for_image_on_screen(bot.images['objects']['stash'][0]):
+            if bot.move_to_direction(direction_in_degrees=270):
+                yield
+    finally:
+        bot.go_to_character_selection()
+        bot.menu_handler.click_on_character_menu_btn('play')
+        logging.info('Play character.')

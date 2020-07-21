@@ -60,7 +60,6 @@ class POEApp:
         return self._bgr_minimap
 
     def get_masked_bgr_minimap(self, mask):
-        # cropped = self._minimap_handler.crop_minimap(self.bgr_screen)
         result = conv.get_masked_bgr_img(self.bgr_minimap,
                                          self.mask_mapping[mask])
         return result

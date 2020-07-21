@@ -30,7 +30,6 @@ def begin():
     logging.basicConfig(level=logging.DEBUG, format=log_format)
 
     s = SeedBot()
-    # s.restart_instance()
     s.run()
 
 def drop_off():
@@ -38,8 +37,7 @@ def drop_off():
     logging.basicConfig(level=logging.INFO, format=log_format)
 
     s = SeedBot()
-    s.drop_off_inventory_items()
-    s.restart_instance()
+    s.drop_off()
 
 def on_press(key):
     global break_program

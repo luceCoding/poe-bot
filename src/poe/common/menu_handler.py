@@ -66,8 +66,8 @@ class MenuNavigator:
 
     def drop_off_all_inventory(self):
         if self._app.imaging.wait_for_image_on_screen(self.menu_images['inventory']):
-            r, c = 5, 11
-            start_pt, end_pt = 1350, 650  # only works for 1920x1080
+            r, c = 5, 12
+            start_pt, end_pt = 1300, 650  # only works for 1920x1080
             interval = 55
             for col in range(c):
                 for row in range(r):

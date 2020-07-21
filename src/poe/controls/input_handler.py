@@ -9,13 +9,17 @@ class InputHandler:
     def click_on_coords(self,
                         mouse='left',
                         coords=(None, None),
-                        pressed='',
-                        double=False):  # 'control','shift','alt'
+                        pressed='', # 'control','shift','alt'
+                        double=False,
+                        button_down=True,
+                        button_up=True):
         self._app.move_mouse(coords=coords)
         self._app.send_click(mouse,
                              coords=coords,
                              pressed=pressed,
-                             double=double)
+                             double=double,
+                             button_down=button_down,
+                             button_up=button_up)
 
     def open_inventory(self):
         self._app.move_mouse()  # avoid text hover's blocking inventory
